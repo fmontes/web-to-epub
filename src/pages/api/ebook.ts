@@ -1,8 +1,9 @@
 import { EPub } from '@lesjoursfr/html-to-epub';
 import ogs from 'open-graph-scraper';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { join } from 'path';
-import fs, { createReadStream } from 'fs';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
 import { Readability } from '@mozilla/readability';
 import { JSDOM } from 'jsdom';
@@ -12,61 +13,45 @@ type ResponseData = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ResponseData>) {
-  const url = req.query.url as string;
+  const url = req.query?.url as string;
 
   if (!url) {
-    return res.status(400).json({
-      message: 'URL is required',
-    });
+    return res.status(400).json({ message: 'URL is required' });
   }
 
-  const html = await fetch(url).then((res) => res.text());
-
-  const doc = new JSDOM(html, {
-    url,
-  });
+  const html = await fetch(url).then((response) => response.text());
+  const doc = new JSDOM(html, { url });
   const reader = new Readability(doc.window.document);
   const data = reader.parse();
+  const og = await ogs({ url }).then((result) => result.result);
 
-  const og = await ogs({
-    url,
-  }).then((res) => res.result);
+  const tempDir = os.tmpdir();
+  const outputPath = path.join(tempDir, 'output.epub');
 
-  const epub = new EPub(
-    {
-      title: og.ogTitle || '',
-      description: og.ogDescription || '',
-      content: [
-        {
-          title: og.ogTitle || '',
-          data: data?.content as string,
-        },
-      ],
-      verbose: true,
-    },
-    'output.epub'
-  );
+  const epub = new EPub({
+    title: og.ogTitle || 'No title provided',
+    description: og.ogDescription || 'No description provided',
+    content: [{
+      title: og.ogTitle || 'Content Title',
+      data: data?.content || '<p>No content available.</p>',
+    }],
+    verbose: true,
+  }, outputPath);
 
-  await epub
-    .render()
-    .then((here) => {
-      console.log('Ebook Generated Successfully!', here);
-    })
-    .catch((err) => {
-      console.error('Failed to generate Ebook because of ', err);
+  try {
+    await epub.render();
+    console.log('Ebook generated successfully at:', outputPath);
+
+    res.setHeader('Content-Type', 'application/epub+zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${path.basename(outputPath)}"`);
+    const fileStream = fs.createReadStream(outputPath);
+    fileStream.pipe(res).on('finish', () => {
+      fs.unlink(outputPath, (err) => {
+        if (err) console.error('Error deleting temporary ePub file:', err);
+      });
     });
-
-  const filePath = join(process.cwd(), '.', 'output.epub');
-
-  // Set headers
-  res.setHeader('Content-Type', 'application/epub+zip');
-  res.setHeader('Content-Disposition', 'attachment; filename=output.epub');
-
-  const fileStream = createReadStream(filePath);
-  fileStream.pipe(res);
-
-  fileStream.pipe(res).on('finish', () => {
-    // Remove the output.epub file after the stream finishes
-    fs.unlinkSync(filePath);
-  });
+  } catch (error) {
+    console.error('Failed to generate ePub:', error);
+    res.status(500).json({ message: 'Failed to generate ePub' });
+  }
 }
