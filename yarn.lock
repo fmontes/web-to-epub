@@ -266,6 +266,15 @@
   dependencies:
     "@types/unist" "*"
 
+"@types/jsdom@^21.1.6":
+  version "21.1.6"
+  resolved "https://registry.yarnpkg.com/@types/jsdom/-/jsdom-21.1.6.tgz#bcbc7b245787ea863f3da1ef19aa1dcfb9271a1b"
+  integrity sha512-/7kkMsC+/kMs7gAYmmBR9P0vGTnOoLhQhyhQJSlXGI5bzTHp6xdo0TtKWQAsz6pmSAeVqKSbqeyP6hytqr9FDw==
+  dependencies:
+    "@types/node" "*"
+    "@types/tough-cookie" "*"
+    parse5 "^7.0.0"
+
 "@types/json5@^0.0.29":
   version "0.0.29"
   resolved "https://registry.npmjs.org/@types/json5/-/json5-0.0.29.tgz"
@@ -278,7 +287,7 @@
   dependencies:
     "@types/unist" "*"
 
-"@types/node@^20":
+"@types/node@*", "@types/node@^20":
   version "20.12.7"
   resolved "https://registry.npmjs.org/@types/node/-/node-20.12.7.tgz"
   integrity sha512-wq0cICSkRLVaf3UGLMGItu/PtdY7oaXaI/RVU+xliKVOtRna3PRY57ZDfztpDL0n11vfymMUnXv8QwYCO7L1wg==
@@ -304,6 +313,11 @@
   dependencies:
     "@types/prop-types" "*"
     csstype "^3.0.2"
+
+"@types/tough-cookie@*":
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-4.0.5.tgz#cb6e2a691b70cb177c6e3ae9c1d2e8b2ea8cd304"
+  integrity sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==
 
 "@types/unist@*", "@types/unist@^3.0.0":
   version "3.0.2"
@@ -2245,7 +2259,7 @@ js-yaml@^4.1.0:
 
 jsdom@^24.0.0:
   version "24.0.0"
-  resolved "https://registry.npmjs.org/jsdom/-/jsdom-24.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/jsdom/-/jsdom-24.0.0.tgz#e2dc04e4c79da368481659818ee2b0cd7c39007c"
   integrity sha512-UDS2NayCvmXSXVP6mpTj+73JnNQadZlr9N68189xib2tx5Mls7swlTNao26IoHv46BZJFvXygyRtyXd1feAk1A==
   dependencies:
     cssstyle "^4.0.1"
